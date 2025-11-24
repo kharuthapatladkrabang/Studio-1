@@ -363,9 +363,10 @@
     
     <script>
         // --- ข้อมูลการตั้งค่า API & GAS (Hybrid Mode) ---
+        // ใช้ URL ล่าสุดที่คุณให้มา
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec';
         
-        // ** ID ที่แก้ไขแล้ว **
+        // ** SPREADSHEET_ID ที่แก้ไขแล้ว **
         const SPREADSHEET_ID = '1asnzno82tqBewq818eNzM7IxkhkOCwmdWFwrGXnkXrQ'; 
 
         const API_KEY = 'AIzaSyCa6APxh8sr1RPTlcZStt4UWnjXjZ-q8Vw'; 
@@ -533,12 +534,14 @@
                     showSwal('success', 'สำเร็จ!', result.message);
                     resetFormState(form, fileInput);
                 } else {
+                    // ข้อผิดพลาดจาก GAS (Runtime Error) จะถูกส่งกลับมาที่นี่
                     showSwal('error', 'ข้อผิดพลาด', result.message);
                 }
 
             } catch (error) {
                 console.error('Submission Error:', error);
-                showSwal('error', 'ข้อผิดพลาดร้ายแรง', error.message);
+                // นี่คือข้อผิดพลาดในการเชื่อมต่อ (Connection Error)
+                showSwal('error', 'ข้อผิดพลาดร้ายแรง', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับ Web App. โปรดตรวจสอบ URL หรือสถานะการ Deploy: ' + error.message);
             }
             
             hideLoadingAndEnableButton(submitBtn, loadingOverlay);
@@ -548,19 +551,20 @@
 
         async function sendDataToAppsScript(data) {
             try {
+                // *** การแก้ไข: นำ 'Content-Type' header ออก เพื่อให้ GAS จัดการเอง
+                // และหลีกเลี่ยงปัญหา preflight request เมื่อรันจาก file:// ***
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    // headers: { 'Content-Type': 'application/json' } // Removed
                 });
                 
                 // GAS doPost should return JSON
                 return await response.json(); 
                 
             } catch (error) {
-                return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อกับ Web App. โปรดตรวจสอบ URL หรือสถานะการ Deploy' };
+                // หาก fetch ล้มเหลวทั้งหมด (เช่น ปัญหา Network, URL ผิด)
+                throw new Error('ไม่สามารถเชื่อมต่อกับ Web App URL: ' + error.message);
             }
         }
 
