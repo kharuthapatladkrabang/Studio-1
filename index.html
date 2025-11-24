@@ -465,8 +465,7 @@
             submitBtn.disabled = true;
             loadingOverlay.style.display = 'flex';
             
-            // Note: Iframe submission proceeds here, bypassing fetch/CORS issues.
-            // Data is sent as form data (multipart/form-data) to the GAS Web App.
+            // Iframe submission proceeds here.
         });
         
         // --- Listener for Iframe Response (postMessage) ---
@@ -475,6 +474,7 @@
             const loadingOverlay = document.getElementById('loading-overlay');
 
             // 1. Check Origin (เพื่อความปลอดภัย)
+            // อนุญาตเฉพาะโดเมนของ GAS และ GitHub Pages ของลูกค้า
             if (e.origin !== 'https://script.google.com' && e.origin !== 'https://kharuthapatladkrabang.github.io') {
                 return; 
             }
