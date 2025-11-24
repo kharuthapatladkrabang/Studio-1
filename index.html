@@ -20,8 +20,8 @@
         body {
             font-family: 'Prompt', sans-serif;
             min-height: 100vh;
-            /* สีหลัก: Red gradient (#ff0000 to #8b0000) */
-            background: linear-gradient(135deg, #ff0000 0%, #8b0000 100%); 
+            /* พื้นหลัง: Red gradient (#ff0000 to #8b0000) */
+            background: linear-gradient(135deg, #ff0000 0%, #8b0000 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -32,18 +32,15 @@
         .container {
             width: 100%;
             max-width: 500px;
-            /* พื้นหลังสีขาวขุ่น 60% (Glassmorphism) */
+            /* Glassmorphism: Background 60% white blur */
             background: rgba(255, 255, 255, 0.6); 
             border-radius: 20px;
             padding: 40px 30px;
-            /* เพิ่มเอฟเฟกต์เบลอ */
-            backdrop-filter: blur(10px); 
-            /* ปรับขอบและเงาให้เข้ากับพื้นหลังสีขาวโปร่งแสง */
-            border: 1px solid rgba(255, 255, 255, 0.3); 
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             animation: fadeIn 0.5s ease-out;
-            /* ตัวอักษรหลักเป็นสีขาว */
-            color: #fff; 
+            color: #fff; /* สีตัวอักษรหลักเป็นสีขาว */
         }
 
         @keyframes fadeIn {
@@ -56,46 +53,46 @@
             font-size: 28px;
             font-weight: 600;
             margin-bottom: 30px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
             font-size: 15px;
             font-weight: 500;
-            color: #fff; /* ตัวอักษรสีขาว */
+            color: #fff; /* Label สีขาว */
             margin-bottom: 8px;
         }
 
         label span {
-            color: #ffdddd; /* สีขาวอมชมพูอ่อน */
+            color: #ffdddd; /* Lighter red for emphasis */
         }
 
+        /* Input, Select, File Button Base Style (อ้างอิงจาก index (20).html) */
         input:not([type="file"]), select {
             width: 100%;
             padding: 12px 16px;
-            /* CHANGE: ใช้ Border 2px สีอ่อน ตามตัวอย่าง (index 20) */
-            border: 2px solid #e0e0e0; 
-            /* อินพุตสีขาวทึบ */
-            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e0e0e0;
+            background: #ffffff; /* พื้นหลังสีขาว */
             border-radius: 10px;
             font-family: 'Prompt', sans-serif;
             font-size: 16px;
             transition: all 0.3s ease;
-            color: #333; /* ตัวอักษรใน Input สีเข้ม */
+            color: #333; /* ตัวอักษรสีเข้ม */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         input:focus, select:focus {
             outline: none;
             background: white;
-            /* CHANGE: Focus Border สีแดงเข้ม ตาม Theme (คล้าย index 20) */
+            /* สีเน้นเป็นแดงเข้ม/ชมพู ตาม theme */
             border-color: #dc2743; 
-            box-shadow: 0 0 0 3px rgba(220, 39, 67, 0.3);
+            box-shadow: 0 0 0 3px rgba(220, 39, 67, 0.2);
         }
 
         input::placeholder {
@@ -103,20 +100,20 @@
             font-weight: 300;
         }
         
-        /* --- START Toggle Button Styling --- */
+        /* Toggle Button Styling (Liquid Effect) */
         .toggle-container {
             display: flex;
             gap: 20px;
             margin-bottom: 25px;
         }
-
+        
         .btn {
             flex-grow: 1;
             position: relative;
             padding: 1rem 1.5rem;
             font-size: 1rem;
-            font-weight: 500;
-            color: #fff; /* ตัวอักษรสีขาว */
+            font-weight: 600;
+            color: #fff; /* ตัวอักษรปกติสีขาว */
             background: none;
             border: 2px solid;
             border-radius: 8px;
@@ -124,42 +121,45 @@
             overflow: hidden;
             transition: all 0.3s ease;
             font-family: 'Prompt', sans-serif !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1;
         }
         
-        /* ปรับสี Border ของ เข้า (เขียวเดิม) */
         .btn.เข้า { border-color: #27ae60; }
-        /* คืนค่าสี Border ของ ออก เป็นสีแดงเข้ม */
-        .btn.ออก { border-color: #c0392b; } 
-
+        .btn.ออก { border-color: #c0392b; }
+        
         .liquid {
+            /* กำหนดสีของ Liquid Fill ในแต่ละปุ่ม */
+            /* Default: (ไม่ควรเห็น) */
             background: linear-gradient(#646cff 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em);
             transition: 0.3s var(--t, 0s), background-position 0.3s calc(0.3s - var(--t, 0s));
         }
 
-        /* ใช้สีเฉพาะเจาะจงตามไฟล์ต้นฉบับสำหรับ เข้า */
-        .btn.เข้า.liquid { background: linear-gradient(#27ae60 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em); }
-        /* คืนค่า Liquid Fill ของ ออก เป็นสีแดงเข้ม */
-        .btn.ออก.liquid { background: linear-gradient(#c0392b 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em); }
-
-        /* เมื่อ Hover หรือ Active */
-        .liquid:hover, .liquid.active {
-            --p: 100%; /* Fill background */
-            --t: 0.3s; /* Transition time */
-            color: #fff; /* เปลี่ยนสีตัวอักษรเป็นสีขาวเมื่อมี Liquid Fill */
+        .btn.เข้า.liquid { 
+            background: linear-gradient(#27ae60 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em); 
         }
         
-        /* --- END Toggle Button Styling --- */
+        .btn.ออก.liquid { 
+            background: linear-gradient(#c0392b 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em); 
+        }
+        
+        .liquid:hover, .liquid.active {
+            --p: 100%;
+            --t: 0.3s;
+            color: #fff; /* สีตัวอักษรเป็นสีขาวเมื่อ active */
+        }
 
 
-        /* File Input Styling */
+        /* File Input Styling (อ้างอิงจาก Input style) */
         .file-upload-wrapper {
             position: relative;
             overflow: hidden;
             display: inline-block;
             width: 100%;
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
-
+        
         .file-upload-wrapper input[type="file"] {
             font-size: 100px;
             position: absolute;
@@ -167,37 +167,30 @@
             top: 0;
             opacity: 0;
             cursor: pointer;
+            width: 100%;
+            height: 100%;
         }
 
         .file-upload-button {
             width: 100%;
-            /* ปุ่มอัปโหลดไฟล์สีขาวทึบ */
-            background: rgba(255, 255, 255, 0.9);
-            color: #333; 
             padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            background: #ffffff; /* พื้นหลังสีขาว */
+            color: #333;
             border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
             text-align: left;
-            /* CHANGE: เปลี่ยน transition ให้ครอบคลุมทุก property สำหรับ focus */
-            transition: all 0.3s ease; 
+            transition: all 0.3s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            /* Border default */
-            border: 2px solid #e0e0e0;
         }
-
-        /* NEW: Focus style สำหรับช่องอัปโหลดไฟล์ */
+        
+        /* สไตล์เมื่อโฟกัส (เพื่อให้เหมือน Input ทั่วไป) */
         .file-upload-wrapper:focus-within .file-upload-button {
-            outline: none;
-            background: white;
-            border-color: #dc2743; /* Focus Border สีแดงเข้ม */
-            box-shadow: 0 0 0 3px rgba(220, 39, 67, 0.3);
-        }
-
-        .file-upload-button:hover {
-            background: white;
+            border-color: #dc2743;
+            box-shadow: 0 0 0 3px rgba(220, 39, 67, 0.2);
         }
 
         #file-name-display {
@@ -205,19 +198,18 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 80%;
+            color: #333;
         }
 
         /* Image Preview */
         #image-preview-container {
             margin-top: 15px;
             text-align: center;
-            /* เส้นประสีเข้มบนพื้นหลังขาว */
-            border: 2px dashed rgba(0, 0, 0, 0.3); 
+            border: 2px dashed rgba(255, 255, 255, 0.5);
             border-radius: 10px;
             padding: 10px;
             display: none;
-            /* background สีอ่อน */
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         #image-preview {
@@ -227,11 +219,10 @@
             object-fit: contain;
         }
 
-        /* Submit Button */
+        /* Submit Button (อ้างอิงจาก index (20).html) */
         button[type="submit"] {
             width: 100%;
             padding: 14px;
-            /* ใช้ gradient สีแดง/ส้ม */
             background: linear-gradient(45deg, #ff416c, #ff4b2b);
             color: white;
             border: none;
@@ -241,15 +232,14 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 10px;
-            /* นำ Shadow จาก index 20 มาใช้แต่ปรับสีให้เข้ากับปุ่ม */
-            box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4); 
+            margin-top: 20px;
+            /* Box Shadow สวยงาม */
+            box-shadow: 0 4px 15px rgba(220, 39, 67, 0.3);
         }
 
         button[type="submit"]:hover:not(:disabled) {
             transform: translateY(-2px);
-            /* นำ Shadow จาก index 20 มาใช้แต่ปรับสีให้เข้ากับปุ่ม */
-            box-shadow: 0 6px 25px rgba(220, 39, 67, 0.6); 
+            box-shadow: 0 6px 25px rgba(220, 39, 67, 0.4);
             background: linear-gradient(45deg, #ff4b2b, #ff416c);
         }
 
@@ -315,8 +305,7 @@
             <!-- 2. รหัสนักศึกษา -->
             <div class="form-group">
                 <label for="studentId">รหัสนักศึกษา <span>*</span></label>
-                <!-- ใช้ type="text" และ pattern เพื่อควบคุมเฉพาะตัวเลขและป้องกัน error จาก number input -->
-                <input type="text" id="studentId" name="studentId" required pattern="[0-9]*" inputmode="numeric" placeholder="กรอกรหัสนักศึกษา">
+                <input type="number" id="studentId" name="studentId" required placeholder="กรอกรหัสนักศึกษา">
             </div>
 
             <!-- 3. เบอร์โทร -->
@@ -331,16 +320,15 @@
                 <input type="number" id="count" name="count" required min="1" placeholder="จำนวนคนในกลุ่ม/ที่มาด้วย">
             </div>
 
-            <!-- 5. รูปภาพ -->
+            <!-- 5. รูปภาพ (Optional) -->
             <div class="form-group">
-                <!-- REMOVED: <span>*</span> -->
                 <label for="file">รูปภาพ (JPG/PNG ไม่เกิน 10MB)</label>
                 <div class="file-upload-wrapper">
-                    <!-- REMOVED: required -->
-                    <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" onchange="previewImage(event)">
+                    <!-- ลบ required ออกเพื่อให้เป็น Optional -->
+                    <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" onchange="previewImage(event)"> 
                     <div class="file-upload-button">
                         <span id="file-name-display">เลือกไฟล์รูปภาพ...</span>
-                        <span style="font-size: 1.2em;">📎</span>
+                        <span style="font-size: 1.2em; color: #999;">📎</span>
                     </div>
                 </div>
                 <div id="image-preview-container">
@@ -362,58 +350,42 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // --- ข้อมูลการตั้งค่า API & GAS (Hybrid Mode) ---
-        // ใช้ URL ล่าสุดที่คุณให้มา
+        // URL ของ Web App (ที่ Deploy แล้ว)
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec';
         
-        // ** SPREADSHEET_ID ที่แก้ไขแล้ว **
-        const SPREADSHEET_ID = '1asnzno82tqBewq818eNzM7IxkhkOCwmdWFwrGXnkXrQ'; 
-
+        // Google Sheet API Key (เก็บไว้แต่ไม่ได้ใช้ในการ Write)
         const API_KEY = 'AIzaSyCa6APxh8sr1RPTlcZStt4UWnjXjZ-q8Vw'; 
-        const DRIVE_FOLDER_ID = '1TJkdIIPDgsoYBwN3h7OHb-i5_ZrrP2qd';
-        
-        // --- ตัวช่วยสำหรับแสดงข้อความ Alert ---
+
+        // --- Utility Functions ---
         function showSwal(icon, title, text) {
             Swal.fire({
                 icon: icon,
                 title: title,
                 text: text,
-                confirmButtonText: 'ตกลง',
-                customClass: {
-                    container: 'prompt-font' // Custom class for font if needed
-                }
+                confirmButtonText: 'ตกลง'
             });
         }
 
         // --- Toggle Button Function ---
         function toggleActivate(btn) {
-            const typeInput = document.getElementById('type');
+            document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const typeValue = btn.getAttribute('data-value');
+            document.getElementById('type').value = typeValue;
+
             const countGroup = document.getElementById('count-group');
             const countInput = document.getElementById('count');
-            const newValue = btn.getAttribute('data-value');
-            
-            if (btn.classList.contains('active')) {
-                btn.classList.remove('active');
-                typeInput.value = ''; 
-                
-                countGroup.style.display = 'block';
-                countInput.required = true;
 
+            if (typeValue === 'ออก') {
+                // ซ่อนช่องจำนวนคน เมื่อเลือก 'ออก'
+                countGroup.style.display = 'none';
+                countInput.removeAttribute('required');
+                countInput.value = 1; // ตั้งค่าเริ่มต้นเพื่อไม่ให้เกิดค่าว่าง
             } else {
-                document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                typeInput.value = newValue;
-
-                if (newValue === 'ออก') {
-                    // ถ้าเลือก 'ออก', ซ่อนจำนวนคนและตั้งค่าเป็น 1 (ไม่บังคับ)
-                    countGroup.style.display = 'none';
-                    countInput.required = false;
-                    countInput.value = 1; 
-                } else {
-                    // ถ้าเลือก 'เข้า', แสดงจำนวนคนและบังคับกรอก
-                    countGroup.style.display = 'block';
-                    countInput.required = true;
-                }
+                // แสดงช่องจำนวนคน เมื่อเลือก 'เข้า'
+                countGroup.style.display = 'block';
+                countInput.setAttribute('required', 'required');
+                countInput.value = ''; // ล้างค่าเดิม
             }
         }
 
@@ -437,7 +409,7 @@
                 const maxSize = 10 * 1024 * 1024;
                 if (file.size > maxSize) {
                     showSwal('error', 'ข้อผิดพลาด', 'ขนาดไฟล์รูปภาพต้องไม่เกิน 10 MB');
-                    fileInput.value = ''; 
+                    fileInput.value = ''; // Clear file input
                     fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
                     return;
                 }
@@ -446,7 +418,7 @@
                 const validTypes = ['image/jpeg', 'image/png'];
                 if (!validTypes.includes(file.type)) {
                     showSwal('error', 'ข้อผิดพลาด', 'รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
-                    fileInput.value = ''; 
+                    fileInput.value = ''; // Clear file input
                     fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
                     return;
                 }
@@ -463,8 +435,8 @@
                 fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
             }
         }
-        
-        // --- Main Submission Handler ---
+
+        // --- Main Submission Handling ---
         document.getElementById('registrationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -472,128 +444,133 @@
             const submitBtn = document.getElementById('submitBtn');
             const loadingOverlay = document.getElementById('loading-overlay');
             const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            
+            // 1. Validate required fields (HTML5 handles most, but check hidden type)
+            if (!document.getElementById('type').value) {
+                showSwal('error', 'ข้อผิดพลาด', 'กรุณาเลือกประเภทการใช้งาน');
+                return;
+            }
+
+            // 2. Phone validation (10 digits)
+            const phone = document.getElementById('phone').value;
+            if (phone.length !== 10 || isNaN(phone)) {
+                showSwal('error', 'ข้อผิดพลาด', 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก');
+                return;
+            }
             
             // Disable button and show loading
             submitBtn.disabled = true;
             loadingOverlay.style.display = 'flex';
 
-            // 1. Client-side Validation
-            const type = document.getElementById('type').value;
-            const phone = document.getElementById('phone').value;
-            const file = fileInput.files[0];
-            const studentId = document.getElementById('studentId').value;
-            const count = document.getElementById('count').value;
-
-            if (!type) {
-                showSwal('error', 'ข้อผิดพลาด', 'กรุณาเลือกประเภทการใช้งาน');
-                hideLoadingAndEnableButton(submitBtn, loadingOverlay);
-                return;
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Convert form data to object
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
             }
-            if (phone.length !== 10 || isNaN(phone)) {
-                showSwal('error', 'ข้อผิดพลาด', 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก');
-                hideLoadingAndEnableButton(submitBtn, loadingOverlay);
-                return;
+
+            // 3. File handling: Convert to base64 before sending
+            if (file) {
+                try {
+                    const base64Data = await readFileAsBase64(file);
+                    data.fileBase64 = base64Data.split(',')[1]; // Base64 part
+                    data.fileName = file.name;
+                    data.fileMimeType = file.type;
+                } catch (error) {
+                    showSwal('error', 'ข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์ได้: ' + error.message);
+                    submitBtn.disabled = false;
+                    loadingOverlay.style.display = 'none';
+                    return;
+                }
             }
             
-            let fileBase64 = null;
-            let fileName = null;
-            let fileMimeType = null;
+            // 4. Send data to Google Apps Script
+            sendDataToAppsScript(data);
+        });
+        
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function sendDataToAppsScript(data) {
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingOverlay = document.getElementById('loading-overlay');
 
             try {
-                // 2. File handling: Convert to base64 before sending to GAS
-                if (file) {
-                    const reader = new FileReader();
-                    // Wrap FileReader in a Promise
-                    fileBase64 = await new Promise((resolve, reject) => {
-                        reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์รูปภาพได้'));
-                        reader.readAsDataURL(file);
-                    });
-                    fileName = file.name;
-                    fileMimeType = file.type;
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    // ตั้งค่า Header เป็น JSON เพื่อให้ Code.gs อ่านได้ถูกต้อง
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data),
+                });
+                
+                // GAS Web App ควรจะส่ง Header CORS กลับมา
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const dataToSend = {
-                    type,
-                    studentId,
-                    phone,
-                    count: type === 'ออก' ? 1 : count, 
-                    fileBase64,
-                    fileName,
-                    fileMimeType,
-                    spreadsheetId: SPREADSHEET_ID,
-                    sheetName: 'Studio 1', 
-                    driveFolderId: DRIVE_FOLDER_ID
-                };
+                const result = await response.json();
                 
-                // 3. Send Data to Google Apps Script
-                const result = await sendDataToAppsScript(dataToSend);
-                
-                // 4. Handle GAS Response
-                if (result.success) {
-                    showSwal('success', 'สำเร็จ!', result.message);
-                    resetFormState(form, fileInput);
-                } else {
-                    // ข้อผิดพลาดจาก GAS (Runtime Error) จะถูกส่งกลับมาที่นี่
-                    showSwal('error', 'ข้อผิดพลาด', result.message);
-                }
+                // Handle response from Apps Script
+                handleResponse(result);
 
             } catch (error) {
                 console.error('Submission Error:', error);
-                // นี่คือข้อผิดพลาดในการเชื่อมต่อ (Connection Error)
-                showSwal('error', 'ข้อผิดพลาดร้ายแรง', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับ Web App. โปรดตรวจสอบ URL หรือสถานะการ Deploy: ' + error.message);
-            }
-            
-            hideLoadingAndEnableButton(submitBtn, loadingOverlay);
-        });
-        
-        // --- Helper Functions ---
-
-        async function sendDataToAppsScript(data) {
-            try {
-                // *** การแก้ไข: นำ 'Content-Type' header ออก เพื่อให้ GAS จัดการเอง
-                // และหลีกเลี่ยงปัญหา preflight request เมื่อรันจาก file:// ***
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    // headers: { 'Content-Type': 'application/json' } // Removed
+                // แสดงข้อความที่เกี่ยวข้องกับ CORS/Connection Error
+                handleResponse({ 
+                    success: false, 
+                    message: `เกิดข้อผิดพลาดในการเชื่อมต่อกับ Web App. โปรดตรวจสอบ URL หรือสถานะการ Deploy: ${error.message}`
                 });
-                
-                // GAS doPost should return JSON
-                return await response.json(); 
-                
-            } catch (error) {
-                // หาก fetch ล้มเหลวทั้งหมด (เช่น ปัญหา Network, URL ผิด)
-                throw new Error('ไม่สามารถเชื่อมต่อกับ Web App URL: ' + error.message);
             }
         }
-
-        function hideLoadingAndEnableButton(btn, loading) {
-            loading.style.display = 'none';
-            btn.disabled = false;
-        }
-
-        function resetFormState(form, fileInput) {
-            form.reset();
-            document.getElementById('type').value = '';
-            
-            document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
-            
-            // Reset file preview
-            fileInput.value = '';
+        
+        // --- Response Handler ---
+        function handleResponse(result) {
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const form = document.getElementById('registrationForm');
+            const fileInput = document.getElementById('file');
             const previewContainer = document.getElementById('image-preview-container');
             const preview = document.getElementById('image-preview');
             const fileNameDisplay = document.getElementById('file-name-display');
-            preview.style.display = 'none';
-            preview.src = '#';
-            previewContainer.style.display = 'none';
-            fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
-            
-            // Reset count group state to default (visible and required)
-            const countGroup = document.getElementById('count-group');
-            const countInput = document.getElementById('count');
-            countGroup.style.display = 'block';
-            countInput.required = true;
+
+            loadingOverlay.style.display = 'none';
+            submitBtn.disabled = false;
+
+            if (result && result.success) {
+                showSwal('success', 'สำเร็จ!', result.message);
+                
+                // Reset form after success
+                form.reset();
+                document.getElementById('type').value = '';
+                document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
+                
+                // Reset file preview
+                fileInput.value = '';
+                preview.style.display = 'none';
+                preview.src = '#';
+                previewContainer.style.display = 'none';
+                fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
+                
+                // ตรวจสอบสถานะของปุ่ม 'เข้า'/'ออก' และตั้งค่าจำนวนคนให้ถูกต้อง (สำหรับกรณี reset)
+                const countGroup = document.getElementById('count-group');
+                const countInput = document.getElementById('count');
+                countGroup.style.display = 'block';
+                countInput.setAttribute('required', 'required');
+
+            } else if (result && !result.success) {
+                // ข้อความ error จาก GAS Backend หรือ Error จาก catch block
+                showSwal('error', 'ข้อผิดพลาดร้ายแรง', result.message);
+            } else {
+                 showSwal('warning', 'แจ้งเตือน', 'ไม่ได้รับการตอบกลับที่ถูกต้องจากระบบ');
+            }
         }
 
     </script>
