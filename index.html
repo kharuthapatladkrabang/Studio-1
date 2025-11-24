@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบลงทะเบียน Studio 1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* CSS 🎨 UI Design: Modern gradient with glassmorphism */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            min-height: 100vh;
+            /* สีหลัก: Red gradient (#ff0000 to #8b0000) */
+            background: linear-gradient(135deg, #ff0000 0%, #8b0000 100%); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto; /* Mobile responsive */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            /* พื้นหลังสีขาวขุ่น 60% (Glassmorphism) */
+            background: rgba(255, 255, 255, 0.6); 
+            border-radius: 20px;
+            padding: 40px 30px;
+            /* เพิ่มเอฟเฟกต์เบลอ */
+            backdrop-filter: blur(10px); 
+            /* ปรับขอบและเงาให้เข้ากับพื้นหลังสีขาวโปร่งแสง */
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            animation: fadeIn 0.5s ease-out;
+            /* ตัวอักษรหลักเป็นสีขาว */
+            color: #fff; 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            color: #fff; /* ตัวอักษรสีขาว */
+            margin-bottom: 8px;
+        }
+
+        label span {
+            color: #ffdddd; /* สีขาวอมชมพูอ่อน */
+        }
+
+        input:not([type="file"]), select {
+            width: 100%;
+            padding: 12px 16px;
+            /* CHANGE: ใช้ Border 2px สีอ่อน ตามตัวอย่าง (index 20) */
+            border: 2px solid #e0e0e0; 
+            /* อินพุตสีขาวทึบ */
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: #333; /* ตัวอักษรใน Input สีเข้ม */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            background: white;
+            /* CHANGE: Focus Border สีแดงเข้ม ตาม Theme (คล้าย index 20) */
+            border-color: #dc2743; 
+            box-shadow: 0 0 0 3px rgba(220, 39, 67, 0.3);
+        }
+
+        input::placeholder {
+            color: #999;
+            font-weight: 300;
+        }
+        
+        /* --- START Toggle Button Styling --- */
+        .toggle-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            flex-grow: 1;
+            position: relative;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff; /* ตัวอักษรสีขาว */
+            background: none;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* ปรับสี Border ของ เข้า (เขียวเดิม) */
+        .btn.เข้า { border-color: #27ae60; }
+        /* คืนค่าสี Border ของ ออก เป็นสีแดงเข้ม */
+        .btn.ออก { border-color: #c0392b; } 
+
+        .liquid {
+            background: linear-gradient(#646cff 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em);
+            transition: 0.3s var(--t, 0s), background-position 0.3s calc(0.3s - var(--t, 0s));
+        }
+
+        /* ใช้สีเฉพาะเจาะจงตามไฟล์ต้นฉบับสำหรับ เข้า */
+        .btn.เข้า.liquid { background: linear-gradient(#27ae60 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em); }
+        /* คืนค่า Liquid Fill ของ ออก เป็นสีแดงเข้ม */
+        .btn.ออก.liquid { background: linear-gradient(#c0392b 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em); }
+
+        /* เมื่อ Hover หรือ Active */
+        .liquid:hover, .liquid.active {
+            --p: 100%; /* Fill background */
+            --t: 0.3s; /* Transition time */
+            color: #fff; /* เปลี่ยนสีตัวอักษรเป็นสีขาวเมื่อมี Liquid Fill */
+        }
+        
+        /* --- END Toggle Button Styling --- */
+
+
+        /* File Input Styling */
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-button {
+            width: 100%;
+            /* ปุ่มอัปโหลดไฟล์สีขาวทึบ */
+            background: rgba(255, 255, 255, 0.9);
+            color: #333; 
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: left;
+            /* CHANGE: เปลี่ยน transition ให้ครอบคลุมทุก property สำหรับ focus */
+            transition: all 0.3s ease; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Border default */
+            border: 2px solid #e0e0e0;
+        }
+
+        /* NEW: Focus style สำหรับช่องอัปโหลดไฟล์ */
+        .file-upload-wrapper:focus-within .file-upload-button {
+            outline: none;
+            background: white;
+            border-color: #dc2743; /* Focus Border สีแดงเข้ม */
+            box-shadow: 0 0 0 3px rgba(220, 39, 67, 0.3);
+        }
+
+        .file-upload-button:hover {
+            background: white;
+        }
+
+        #file-name-display {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+        }
+
+        /* Image Preview */
+        #image-preview-container {
+            margin-top: 15px;
+            text-align: center;
+            /* เส้นประสีเข้มบนพื้นหลังขาว */
+            border: 2px dashed rgba(0, 0, 0, 0.3); 
+            border-radius: 10px;
+            padding: 10px;
+            display: none;
+            /* background สีอ่อน */
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        #image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        /* Submit Button */
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            /* ใช้ gradient สีแดง/ส้ม */
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            /* นำ Shadow จาก index 20 มาใช้แต่ปรับสีให้เข้ากับปุ่ม */
+            box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4); 
+        }
+
+        button[type="submit"]:hover:not(:disabled) {
+            transform: translateY(-2px);
+            /* นำ Shadow จาก index 20 มาใช้แต่ปรับสีให้เข้ากับปุ่ม */
+            box-shadow: 0 6px 25px rgba(220, 39, 67, 0.6); 
+            background: linear-gradient(45deg, #ff4b2b, #ff416c);
+        }
+
+        button[type="submit"]:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button[type="submit"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading animation ⚙️ */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #loading-overlay p {
+            color: white;
+            font-weight: 300;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ระบบลงทะเบียน Studio 1</h1>
+        
+        <form id="registrationForm">
+
+            <!-- 1. ประเภทการใช้งาน (Toggle Button) -->
+            <label for="type">ประเภทการใช้งาน <span>*</span></label>
+            <div class="toggle-container" id="type-toggle-container">
+                <button type="button" class="btn liquid เข้า" data-value="เข้า" onclick="toggleActivate(this)"><span>เข้า</span></button>
+                <button type="button" class="btn liquid ออก" data-value="ออก" onclick="toggleActivate(this)"><span>ออก</span></button>
+                <input type="hidden" id="type" name="type" required>
+            </div>
+            
+            <!-- 2. รหัสนักศึกษา -->
+            <div class="form-group">
+                <label for="studentId">รหัสนักศึกษา <span>*</span></label>
+                <!-- ใช้ type="text" และ pattern เพื่อควบคุมเฉพาะตัวเลขและป้องกัน error จาก number input -->
+                <input type="text" id="studentId" name="studentId" required pattern="[0-9]*" inputmode="numeric" placeholder="กรอกรหัสนักศึกษา">
+            </div>
+
+            <!-- 3. เบอร์โทร -->
+            <div class="form-group">
+                <label for="phone">เบอร์โทร <span>*</span></label>
+                <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="08XXXXXXXX" maxlength="10">
+            </div>
+
+            <!-- 4. จำนวนคน -->
+            <div class="form-group" id="count-group">
+                <label for="count">จำนวนคน <span>*</span></label>
+                <input type="number" id="count" name="count" required min="1" placeholder="จำนวนคนในกลุ่ม/ที่มาด้วย">
+            </div>
+
+            <!-- 5. รูปภาพ -->
+            <div class="form-group">
+                <!-- REMOVED: <span>*</span> -->
+                <label for="file">รูปภาพ (JPG/PNG ไม่เกิน 10MB)</label>
+                <div class="file-upload-wrapper">
+                    <!-- REMOVED: required -->
+                    <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" onchange="previewImage(event)">
+                    <div class="file-upload-button">
+                        <span id="file-name-display">เลือกไฟล์รูปภาพ...</span>
+                        <span style="font-size: 1.2em;">📎</span>
+                    </div>
+                </div>
+                <div id="image-preview-container">
+                    <img id="image-preview" src="#" alt="Image Preview" style="display:none;">
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">บันทึกข้อมูล</button>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>กำลังส่งข้อมูล...</p>
+    </div>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // --- ข้อมูลการตั้งค่า API (ใช้ API Key โดยตรง) ---
+        const API_KEY = 'AIzaSyBivhVOiCJdpVF4xNb7vYRNJLxLj60Rk0';
+        const SPREADSHEET_ID = '1asnzno82tqBewq818eNzM7IxkhwOCwmdWFwrGXnkXrQ';
+        const SHEET_NAME = 'Studio 1'; // Sheet Name ที่ต้องการบันทึก
+        const DRIVE_FOLDER_ID = '1TJkdIIPDgsoYBwN3h7OHb-i5_ZrrP2qd';
+        
+        // --- URL ของ Google API Endpoints ---
+        // ปรับเป็น A:G เพราะลบ Email ออก
+        const SHEETS_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A:G:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+        const DRIVE_API_UPLOAD_URL = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=${API_KEY}`;
+        
+        // --- ตัวช่วยสำหรับแสดงข้อความ Alert ---
+        function showSwal(icon, title, text) {
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+                confirmButtonText: 'ตกลง',
+                customClass: {
+                    container: 'prompt-font' // Custom class for font if needed
+                }
+            });
+        }
+
+        // --- Toggle Button Function (อ้างอิงจาก Logic ของไฟล์ต้นฉบับ) ---
+        function toggleActivate(btn) {
+            const typeInput = document.getElementById('type');
+            const countGroup = document.getElementById('count-group');
+            const countInput = document.getElementById('count');
+            const newValue = btn.getAttribute('data-value');
+            
+            // If the same button is clicked, toggle it off (per original logic)
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                typeInput.value = ''; 
+                
+                // Reset to default (Entry, show count) 
+                countGroup.style.display = 'block';
+                countInput.required = true;
+
+            } else {
+                // A new button is selected/activated
+                document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                typeInput.value = newValue;
+
+                // LOGIC: Hide/Show Count Field
+                if (newValue === 'ออก') {
+                    // If Exit is selected, hide count field and make it non-required
+                    countGroup.style.display = 'none';
+                    countInput.required = false;
+                    countInput.value = 1; // Default to 1 for sheet saving
+                } else {
+                    // If Entry is selected, show count field and make it required
+                    countGroup.style.display = 'block';
+                    countInput.required = true;
+                }
+            }
+        }
+
+        // --- Image Preview and File Validation ---
+        function previewImage(event) {
+            const fileInput = event.target;
+            const file = fileInput.files[0];
+            const previewContainer = document.getElementById('image-preview-container');
+            const preview = document.getElementById('image-preview');
+            const fileNameDisplay = document.getElementById('file-name-display');
+            
+            // Reset state
+            preview.style.display = 'none';
+            preview.src = '#';
+            previewContainer.style.display = 'none';
+
+            if (file) {
+                fileNameDisplay.textContent = file.name;
+
+                // 1. File size validation (ไม่เกิน 10 MB)
+                const maxSize = 10 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    showSwal('error', 'ข้อผิดพลาด', 'ขนาดไฟล์รูปภาพต้องไม่เกิน 10 MB');
+                    fileInput.value = ''; 
+                    fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
+                    return;
+                }
+
+                // 2. File type validation (jpg/png เท่านั้น)
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    showSwal('error', 'ข้อผิดพลาด', 'รองรับเฉพาะไฟล์ JPG และ PNG เท่านั้น');
+                    fileInput.value = ''; 
+                    fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
+            }
+        }
+        
+        // --- Main Submission Handler ---
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const fileInput = document.getElementById('file');
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            loadingOverlay.style.display = 'flex';
+
+            // 1. Client-side Validation (เพิ่มเติม)
+            const type = document.getElementById('type').value;
+            const studentId = document.getElementById('studentId').value;
+            const phone = document.getElementById('phone').value;
+            const file = fileInput.files[0];
+
+            if (!type) {
+                showSwal('error', 'ข้อผิดพลาด', 'กรุณาเลือกประเภทการใช้งาน');
+                hideLoadingAndEnableButton(submitBtn, loadingOverlay);
+                return;
+            }
+            if (phone.length !== 10 || isNaN(phone)) {
+                showSwal('error', 'ข้อผิดพลาด', 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก');
+                hideLoadingAndEnableButton(submitBtn, loadingOverlay);
+                return;
+            }
+            
+            // --- REMOVED: Mandatory File Check ---
+            /*
+            if (!file) {
+                showSwal('error', 'ข้อผิดพลาด', 'กรุณาอัปโหลดรูปภาพ (ต้องระบุ)');
+                hideLoadingAndEnableButton(submitBtn, loadingOverlay);
+                return;
+            }
+            */
+            // ----------------------------------
+            
+            let fileLink = 'ไม่มีรูปภาพ';
+            let fileId = 'N/A';
+            
+            try {
+                // 2. Upload File to Google Drive (if file exists)
+                
+                // Check if a file was actually selected (now optional)
+                if (file) {
+                    fileLink = `อัปโหลดต้องใช้ OAuth/Backend`; 
+                    fileId = `FILE_UPLOAD_SKIPPED`;
+                    
+                    showSwal('warning', 'แจ้งเตือน (Drive API)', 'การอัปโหลดรูปภาพไปยัง Google Drive โดยตรงจาก Local HTML File นั้นไม่ปลอดภัยและมักจะถูกปฏิเสธเนื่องจากต้องใช้ OAuth Token หรือ Backend กรุณาใช้ Google Apps Script หากต้องการฟังก์ชันนี้');
+                }
+                
+                // 3. Save Data to Google Sheet
+                await saveDataToSheet(type, studentId, phone, document.getElementById('count').value, fileId, fileLink);
+                
+                // 4. Success and Reset
+                showSwal('success', 'สำเร็จ!', 'ลงทะเบียนและบันทึกข้อมูลเรียบร้อยแล้ว');
+                resetFormState(form, fileInput);
+
+            } catch (error) {
+                console.error('Submission Error:', error);
+                showSwal('error', 'ข้อผิดพลาดร้ายแรง', `${error.message}.`);
+            }
+            
+            hideLoadingAndEnableButton(submitBtn, loadingOverlay);
+        });
+        
+        // --- Helper Functions ---
+
+        function hideLoadingAndEnableButton(btn, loading) {
+            loading.style.display = 'none';
+            btn.disabled = false;
+        }
+
+        function resetFormState(form, fileInput) {
+            form.reset();
+            document.getElementById('type').value = '';
+            // Reset active class on buttons
+            document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
+            
+            // Reset file preview
+            fileInput.value = '';
+            const previewContainer = document.getElementById('image-preview-container');
+            const preview = document.getElementById('image-preview');
+            const fileNameDisplay = document.getElementById('file-name-display');
+            preview.style.display = 'none';
+            preview.src = '#';
+            previewContainer.style.display = 'none';
+            fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
+            
+            // Reset count group state to default (visible and required)
+            const countGroup = document.getElementById('count-group');
+            const countInput = document.getElementById('count');
+            countGroup.style.display = 'block';
+            countInput.required = true;
+        }
+
+        // Removed function uploadFileToDrive(file) as it is not secure/functional from local file without OAuth.
+
+        async function saveDataToSheet(type, studentId, phone, count, fileId, fileLink) {
+            const now = new Date();
+            const timestamp = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+
+            const rowData = [
+                timestamp,
+                type,
+                String(studentId),
+                String(phone),
+                Number(count),
+                fileId,
+                fileLink
+            ];
+            // ลำดับคอลัมน์: Timestamp, ประเภทโต๊ะ, รหัสนักศึกษา, เบอร์โทร, จำนวนคน, ID รูปภาพ, Link รูปภาพ (7 คอลัมน์)
+
+            const requestBody = {
+                values: [rowData]
+            };
+            
+            // NOTE: Authorization must be configured on the Sheet itself (Public Edit Access) 
+            // or by providing a valid OAuth token in the Authorization header.
+            const headers = {
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_OAUTH_TOKEN_HERE' // ต้องมีสำหรับ Write/Append ที่เป็น Private
+            };
+
+            try {
+                const response = await fetch(SHEETS_API_URL, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMessage = errorData.error ? errorData.error.message : response.statusText;
+                    
+                    if (response.status === 401 || response.status === 403) {
+                         errorMessage = "401/403: ไม่ได้รับอนุญาต! คุณต้องตั้งค่า Google Sheet ให้เป็น Public (Anyone with the link can edit) หรือต้องใช้ OAuth 2.0 Token สำหรับการบันทึกข้อมูล";
+                    }
+                    
+                    throw new Error(`Google Sheets API Error: ${errorMessage}`);
+                }
+                
+                // Success
+                return await response.json();
+
+            } catch (error) {
+                // We re-throw the detailed error message as requested by the user's report
+                throw new Error(`เกิดข้อผิดพลาดในการเชื่อมต่อ Sheets API: ${error.message}`);
+            }
+        }
+
+    </script>
+</body>
+</html>
