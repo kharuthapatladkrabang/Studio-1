@@ -362,16 +362,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // --- ข้อมูลการตั้งค่า API (ใช้ API Key โดยตรง) ---
-        const API_KEY = 'AIzaSyBivhVOiCJdpVF4xNb7vYRNJLxLj60Rk0';
-        const SPREADSHEET_ID = '1asnzno82tqBewq818eNzM7IxkhwOCwmdWFwrGXnkXrQ';
-        const SHEET_NAME = 'Studio 1'; // Sheet Name ที่ต้องการบันทึก
-        const DRIVE_FOLDER_ID = '1TJkdIIPDgsoYBwN3h7OHb-i5_ZrrP2qd';
+        // --- ข้อมูลการตั้งค่า API & GAS (Hybrid Mode) ---
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec';
         
-        // --- URL ของ Google API Endpoints ---
-        // ปรับเป็น A:G เพราะลบ Email ออก
-        const SHEETS_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!A:G:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
-        const DRIVE_API_UPLOAD_URL = `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&key=${API_KEY}`;
+        // ** ID ที่แก้ไขแล้ว **
+        const SPREADSHEET_ID = '1asnzno82tqBewq818eNzM7IxkhkOCwmdWFwrGXnkXrQ'; 
+
+        const API_KEY = 'AIzaSyCa6APxh8sr1RPTlcZStt4UWnjXjZ-q8Vw'; 
+        const DRIVE_FOLDER_ID = '1TJkdIIPDgsoYBwN3h7OHb-i5_ZrrP2qd';
         
         // --- ตัวช่วยสำหรับแสดงข้อความ Alert ---
         function showSwal(icon, title, text) {
@@ -386,36 +384,32 @@
             });
         }
 
-        // --- Toggle Button Function (อ้างอิงจาก Logic ของไฟล์ต้นฉบับ) ---
+        // --- Toggle Button Function ---
         function toggleActivate(btn) {
             const typeInput = document.getElementById('type');
             const countGroup = document.getElementById('count-group');
             const countInput = document.getElementById('count');
             const newValue = btn.getAttribute('data-value');
             
-            // If the same button is clicked, toggle it off (per original logic)
             if (btn.classList.contains('active')) {
                 btn.classList.remove('active');
                 typeInput.value = ''; 
                 
-                // Reset to default (Entry, show count) 
                 countGroup.style.display = 'block';
                 countInput.required = true;
 
             } else {
-                // A new button is selected/activated
                 document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 typeInput.value = newValue;
 
-                // LOGIC: Hide/Show Count Field
                 if (newValue === 'ออก') {
-                    // If Exit is selected, hide count field and make it non-required
+                    // ถ้าเลือก 'ออก', ซ่อนจำนวนคนและตั้งค่าเป็น 1 (ไม่บังคับ)
                     countGroup.style.display = 'none';
                     countInput.required = false;
-                    countInput.value = 1; // Default to 1 for sheet saving
+                    countInput.value = 1; 
                 } else {
-                    // If Entry is selected, show count field and make it required
+                    // ถ้าเลือก 'เข้า', แสดงจำนวนคนและบังคับกรอก
                     countGroup.style.display = 'block';
                     countInput.required = true;
                 }
@@ -482,11 +476,12 @@
             submitBtn.disabled = true;
             loadingOverlay.style.display = 'flex';
 
-            // 1. Client-side Validation (เพิ่มเติม)
+            // 1. Client-side Validation
             const type = document.getElementById('type').value;
-            const studentId = document.getElementById('studentId').value;
             const phone = document.getElementById('phone').value;
             const file = fileInput.files[0];
+            const studentId = document.getElementById('studentId').value;
+            const count = document.getElementById('count').value;
 
             if (!type) {
                 showSwal('error', 'ข้อผิดพลาด', 'กรุณาเลือกประเภทการใช้งาน');
@@ -499,46 +494,75 @@
                 return;
             }
             
-            // --- REMOVED: Mandatory File Check ---
-            /*
-            if (!file) {
-                showSwal('error', 'ข้อผิดพลาด', 'กรุณาอัปโหลดรูปภาพ (ต้องระบุ)');
-                hideLoadingAndEnableButton(submitBtn, loadingOverlay);
-                return;
-            }
-            */
-            // ----------------------------------
-            
-            let fileLink = 'ไม่มีรูปภาพ';
-            let fileId = 'N/A';
-            
+            let fileBase64 = null;
+            let fileName = null;
+            let fileMimeType = null;
+
             try {
-                // 2. Upload File to Google Drive (if file exists)
-                
-                // Check if a file was actually selected (now optional)
+                // 2. File handling: Convert to base64 before sending to GAS
                 if (file) {
-                    fileLink = `อัปโหลดต้องใช้ OAuth/Backend`; 
-                    fileId = `FILE_UPLOAD_SKIPPED`;
-                    
-                    showSwal('warning', 'แจ้งเตือน (Drive API)', 'การอัปโหลดรูปภาพไปยัง Google Drive โดยตรงจาก Local HTML File นั้นไม่ปลอดภัยและมักจะถูกปฏิเสธเนื่องจากต้องใช้ OAuth Token หรือ Backend กรุณาใช้ Google Apps Script หากต้องการฟังก์ชันนี้');
+                    const reader = new FileReader();
+                    // Wrap FileReader in a Promise
+                    fileBase64 = await new Promise((resolve, reject) => {
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์รูปภาพได้'));
+                        reader.readAsDataURL(file);
+                    });
+                    fileName = file.name;
+                    fileMimeType = file.type;
                 }
+
+                const dataToSend = {
+                    type,
+                    studentId,
+                    phone,
+                    count: type === 'ออก' ? 1 : count, 
+                    fileBase64,
+                    fileName,
+                    fileMimeType,
+                    spreadsheetId: SPREADSHEET_ID,
+                    sheetName: 'Studio 1', 
+                    driveFolderId: DRIVE_FOLDER_ID
+                };
                 
-                // 3. Save Data to Google Sheet
-                await saveDataToSheet(type, studentId, phone, document.getElementById('count').value, fileId, fileLink);
+                // 3. Send Data to Google Apps Script
+                const result = await sendDataToAppsScript(dataToSend);
                 
-                // 4. Success and Reset
-                showSwal('success', 'สำเร็จ!', 'ลงทะเบียนและบันทึกข้อมูลเรียบร้อยแล้ว');
-                resetFormState(form, fileInput);
+                // 4. Handle GAS Response
+                if (result.success) {
+                    showSwal('success', 'สำเร็จ!', result.message);
+                    resetFormState(form, fileInput);
+                } else {
+                    showSwal('error', 'ข้อผิดพลาด', result.message);
+                }
 
             } catch (error) {
                 console.error('Submission Error:', error);
-                showSwal('error', 'ข้อผิดพลาดร้ายแรง', `${error.message}.`);
+                showSwal('error', 'ข้อผิดพลาดร้ายแรง', error.message);
             }
             
             hideLoadingAndEnableButton(submitBtn, loadingOverlay);
         });
         
         // --- Helper Functions ---
+
+        async function sendDataToAppsScript(data) {
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // GAS doPost should return JSON
+                return await response.json(); 
+                
+            } catch (error) {
+                return { success: false, message: 'เกิดข้อผิดพลาดในการเชื่อมต่อกับ Web App. โปรดตรวจสอบ URL หรือสถานะการ Deploy' };
+            }
+        }
 
         function hideLoadingAndEnableButton(btn, loading) {
             loading.style.display = 'none';
@@ -548,7 +572,7 @@
         function resetFormState(form, fileInput) {
             form.reset();
             document.getElementById('type').value = '';
-            // Reset active class on buttons
+            
             document.querySelectorAll('.toggle-container .btn').forEach(b => b.classList.remove('active'));
             
             // Reset file preview
@@ -566,61 +590,6 @@
             const countInput = document.getElementById('count');
             countGroup.style.display = 'block';
             countInput.required = true;
-        }
-
-        // Removed function uploadFileToDrive(file) as it is not secure/functional from local file without OAuth.
-
-        async function saveDataToSheet(type, studentId, phone, count, fileId, fileLink) {
-            const now = new Date();
-            const timestamp = now.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-
-            const rowData = [
-                timestamp,
-                type,
-                String(studentId),
-                String(phone),
-                Number(count),
-                fileId,
-                fileLink
-            ];
-            // ลำดับคอลัมน์: Timestamp, ประเภทโต๊ะ, รหัสนักศึกษา, เบอร์โทร, จำนวนคน, ID รูปภาพ, Link รูปภาพ (7 คอลัมน์)
-
-            const requestBody = {
-                values: [rowData]
-            };
-            
-            // NOTE: Authorization must be configured on the Sheet itself (Public Edit Access) 
-            // or by providing a valid OAuth token in the Authorization header.
-            const headers = {
-                'Content-Type': 'application/json',
-                // 'Authorization': 'Bearer YOUR_OAUTH_TOKEN_HERE' // ต้องมีสำหรับ Write/Append ที่เป็น Private
-            };
-
-            try {
-                const response = await fetch(SHEETS_API_URL, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    let errorMessage = errorData.error ? errorData.error.message : response.statusText;
-                    
-                    if (response.status === 401 || response.status === 403) {
-                         errorMessage = "401/403: ไม่ได้รับอนุญาต! คุณต้องตั้งค่า Google Sheet ให้เป็น Public (Anyone with the link can edit) หรือต้องใช้ OAuth 2.0 Token สำหรับการบันทึกข้อมูล";
-                    }
-                    
-                    throw new Error(`Google Sheets API Error: ${errorMessage}`);
-                }
-                
-                // Success
-                return await response.json();
-
-            } catch (error) {
-                // We re-throw the detailed error message as requested by the user's report
-                throw new Error(`เกิดข้อผิดพลาดในการเชื่อมต่อ Sheets API: ${error.message}`);
-            }
         }
 
     </script>
