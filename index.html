@@ -291,6 +291,7 @@
     <div class="container">
         <h1>ระบบลงทะเบียน Studio 1</h1>
         
+        <!-- *** กรุณาเปลี่ยน URL ใน action เป็น URL ใหม่ที่คุณ Deploy ในขั้นตอนที่ 3 *** -->
         <form id="registrationForm" 
               action="https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec" 
               method="POST" 
@@ -356,7 +357,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
-        // URL ของ Web App (ที่ Deploy แล้ว)
+        // URL ของ Web App (ที่ Deploy แล้ว) - ใช้ URL เดียวกับใน form action
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec';
         
         // --- Utility Functions ---
@@ -472,16 +473,16 @@
         window.addEventListener('message', function(e) {
             const submitBtn = document.getElementById('submitBtn');
             const loadingOverlay = document.getElementById('loading-overlay');
-
-            // 1. Check Origin (เพื่อความปลอดภัย)
-            // อนุญาตเฉพาะโดเมนของ GAS และ GitHub Pages ของลูกค้า
-            if (e.origin !== 'https://script.google.com' && e.origin !== 'https://kharuthapatladkrabang.github.io') {
-                return; 
-            }
-
+            
+            // ⚠️ ปิด Loading ทันทีเมื่อได้รับการตอบกลับ
             loadingOverlay.style.display = 'none';
             submitBtn.disabled = false;
             
+            // 1. Check Origin (เพื่อความปลอดภัย - ต้องตรงกับ URL ของ GAS)
+            if (e.origin !== 'https://script.google.com') {
+                return; 
+            }
+
             try {
                 const result = JSON.parse(e.data);
                 // Handle response from Apps Script
