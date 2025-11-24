@@ -53,7 +53,7 @@
             font-size: 28px;
             font-weight: 600;
             margin-bottom: 30px;
-            color: #fff;
+            color: #fff; /* สีหัวข้อเป็นสีขาว */
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
@@ -129,7 +129,6 @@
         .btn.ออก { border-color: #c0392b; }
         
         .liquid {
-            /* กำหนดสีของ Liquid Fill ในแต่ละปุ่ม */
             background: linear-gradient(#646cff 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em);
             transition: 0.3s var(--t, 0s), background-position 0.3s calc(0.3s - var(--t, 0s));
         }
@@ -291,7 +290,7 @@
     <div class="container">
         <h1>ระบบลงทะเบียน Studio 1</h1>
         
-        <!-- *** กรุณาเปลี่ยน URL ใน action เป็น URL ใหม่ที่คุณ Deploy ในขั้นตอนที่ 3 *** -->
+        <!-- *** URL ของ Apps Script ที่คุณ Deploy แล้ว *** -->
         <form id="registrationForm" 
               action="https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec" 
               method="POST" 
@@ -478,14 +477,14 @@
             loadingOverlay.style.display = 'none';
             submitBtn.disabled = false;
             
-            // 1. Check Origin (เพื่อความปลอดภัย - ต้องตรงกับ URL ของ GAS)
+            // 1. Check Origin (เพื่อความปลอดภัย - ต้องมาจาก script.google.com)
             if (e.origin !== 'https://script.google.com') {
                 return; 
             }
 
             try {
+                // e.data คือ JSON string ที่มาจาก GAS
                 const result = JSON.parse(e.data);
-                // Handle response from Apps Script
                 handleResponse(result);
             } catch (error) {
                 console.error('Iframe Response Error:', error);
