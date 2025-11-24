@@ -73,7 +73,7 @@
             color: #ffdddd; /* Lighter red for emphasis */
         }
 
-        /* Input, Select, File Button Base Style (อ้างอิงจาก index (20).html) */
+        /* Input, Select, File Button Base Style */
         input:not([type="file"]), select {
             width: 100%;
             padding: 12px 16px;
@@ -130,7 +130,6 @@
         
         .liquid {
             /* กำหนดสีของ Liquid Fill ในแต่ละปุ่ม */
-            /* Default: (ไม่ควรเห็น) */
             background: linear-gradient(#646cff 0 0) no-repeat calc(200% - var(--p, 0%)) 100% / 200% var(--p, 0.2em);
             transition: 0.3s var(--t, 0s), background-position 0.3s calc(0.3s - var(--t, 0s));
         }
@@ -292,7 +291,11 @@
     <div class="container">
         <h1>ระบบลงทะเบียน Studio 1</h1>
         
-        <form id="registrationForm">
+        <form id="registrationForm" 
+              action="https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec" 
+              method="POST" 
+              enctype="multipart/form-data" 
+              target="gs-iframe">
 
             <!-- 1. ประเภทการใช้งาน (Toggle Button) -->
             <label for="type">ประเภทการใช้งาน <span>*</span></label>
@@ -324,7 +327,7 @@
             <div class="form-group">
                 <label for="file">รูปภาพ (JPG/PNG ไม่เกิน 10MB)</label>
                 <div class="file-upload-wrapper">
-                    <!-- ลบ required ออกเพื่อให้เป็น Optional -->
+                    <!-- ใช้ name="file" สำหรับ Iframe submission -->
                     <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" onchange="previewImage(event)"> 
                     <div class="file-upload-button">
                         <span id="file-name-display">เลือกไฟล์รูปภาพ...</span>
@@ -346,6 +349,9 @@
         <p>กำลังส่งข้อมูล...</p>
     </div>
 
+    <!-- Iframe for GAS Submission (สำคัญมากสำหรับเทคนิค Iframe) -->
+    <iframe id="gs-iframe" name="gs-iframe" style="display:none;"></iframe>
+
     <!-- SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -353,9 +359,6 @@
         // URL ของ Web App (ที่ Deploy แล้ว)
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyccfJLBCeKj09sZqRIHmf517SDmxzua2AMRM2OPxmiHMRi_gsg5U2axE6AuKDR4PMr/exec';
         
-        // Google Sheet API Key (เก็บไว้แต่ไม่ได้ใช้ในการ Write)
-        const API_KEY = 'AIzaSyCa6APxh8sr1RPTlcZStt4UWnjXjZ-q8Vw'; 
-
         // --- Utility Functions ---
         function showSwal(icon, title, text) {
             Swal.fire({
@@ -437,17 +440,15 @@
         }
 
         // --- Main Submission Handling ---
-        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
             
             const form = e.target;
             const submitBtn = document.getElementById('submitBtn');
             const loadingOverlay = document.getElementById('loading-overlay');
-            const fileInput = document.getElementById('file');
-            const file = fileInput.files[0];
             
-            // 1. Validate required fields (HTML5 handles most, but check hidden type)
+            // 1. Validate required fields
             if (!document.getElementById('type').value) {
+                e.preventDefault();
                 showSwal('error', 'ข้อผิดพลาด', 'กรุณาเลือกประเภทการใช้งาน');
                 return;
             }
@@ -455,94 +456,49 @@
             // 2. Phone validation (10 digits)
             const phone = document.getElementById('phone').value;
             if (phone.length !== 10 || isNaN(phone)) {
+                e.preventDefault();
                 showSwal('error', 'ข้อผิดพลาด', 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก');
                 return;
             }
             
-            // Disable button and show loading
+            // Disable button and show loading (ก่อนส่งฟอร์ม)
             submitBtn.disabled = true;
             loadingOverlay.style.display = 'flex';
-
-            const formData = new FormData(form);
-            const data = {};
             
-            // Convert form data to object
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-
-            // 3. File handling: Convert to base64 before sending
-            if (file) {
-                try {
-                    const base64Data = await readFileAsBase64(file);
-                    data.fileBase64 = base64Data.split(',')[1]; // Base64 part
-                    data.fileName = file.name;
-                    data.fileMimeType = file.type;
-                } catch (error) {
-                    showSwal('error', 'ข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์ได้: ' + error.message);
-                    submitBtn.disabled = false;
-                    loadingOverlay.style.display = 'none';
-                    return;
-                }
-            }
-            
-            // 4. Send data to Google Apps Script
-            sendDataToAppsScript(data);
+            // Note: Iframe submission proceeds here, bypassing fetch/CORS issues.
+            // Data is sent as form data (multipart/form-data) to the GAS Web App.
         });
         
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function sendDataToAppsScript(data) {
+        // --- Listener for Iframe Response (postMessage) ---
+        window.addEventListener('message', function(e) {
             const submitBtn = document.getElementById('submitBtn');
             const loadingOverlay = document.getElementById('loading-overlay');
 
-            try {
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    // ตั้งค่า Header เป็น JSON เพื่อให้ Code.gs อ่านได้ถูกต้อง
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(data),
-                });
-                
-                // GAS Web App ควรจะส่ง Header CORS กลับมา
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+            // 1. Check Origin (เพื่อความปลอดภัย)
+            if (e.origin !== 'https://script.google.com' && e.origin !== 'https://kharuthapatladkrabang.github.io') {
+                return; 
+            }
 
-                const result = await response.json();
-                
+            loadingOverlay.style.display = 'none';
+            submitBtn.disabled = false;
+            
+            try {
+                const result = JSON.parse(e.data);
                 // Handle response from Apps Script
                 handleResponse(result);
-
             } catch (error) {
-                console.error('Submission Error:', error);
-                // แสดงข้อความที่เกี่ยวข้องกับ CORS/Connection Error
-                handleResponse({ 
-                    success: false, 
-                    message: `เกิดข้อผิดพลาดในการเชื่อมต่อกับ Web App. โปรดตรวจสอบ URL หรือสถานะการ Deploy: ${error.message}`
-                });
+                console.error('Iframe Response Error:', error);
+                showSwal('warning', 'แจ้งเตือน', 'ไม่สามารถประมวลผลการตอบกลับจากระบบได้');
             }
-        }
+        });
         
         // --- Response Handler ---
         function handleResponse(result) {
-            const submitBtn = document.getElementById('submitBtn');
-            const loadingOverlay = document.getElementById('loading-overlay');
             const form = document.getElementById('registrationForm');
             const fileInput = document.getElementById('file');
             const previewContainer = document.getElementById('image-preview-container');
             const preview = document.getElementById('image-preview');
             const fileNameDisplay = document.getElementById('file-name-display');
-
-            loadingOverlay.style.display = 'none';
-            submitBtn.disabled = false;
 
             if (result && result.success) {
                 showSwal('success', 'สำเร็จ!', result.message);
@@ -559,14 +515,14 @@
                 previewContainer.style.display = 'none';
                 fileNameDisplay.textContent = 'เลือกไฟล์รูปภาพ...';
                 
-                // ตรวจสอบสถานะของปุ่ม 'เข้า'/'ออก' และตั้งค่าจำนวนคนให้ถูกต้อง (สำหรับกรณี reset)
+                // ตั้งค่าจำนวนคนให้ถูกต้อง (สำหรับกรณี reset)
                 const countGroup = document.getElementById('count-group');
                 const countInput = document.getElementById('count');
                 countGroup.style.display = 'block';
                 countInput.setAttribute('required', 'required');
 
             } else if (result && !result.success) {
-                // ข้อความ error จาก GAS Backend หรือ Error จาก catch block
+                // ข้อความ error จาก GAS Backend
                 showSwal('error', 'ข้อผิดพลาดร้ายแรง', result.message);
             } else {
                  showSwal('warning', 'แจ้งเตือน', 'ไม่ได้รับการตอบกลับที่ถูกต้องจากระบบ');
